@@ -19,10 +19,6 @@ namespace KGDownload
     {
         private string defaultPath = Path.Combine(Application.StartupPath, "songs");
 
-        private string downloadName;
-
-        private static object lockObject = new object();
-
         public Form1()
         {
             InitializeComponent();
@@ -42,7 +38,7 @@ namespace KGDownload
                 labState.Text = "正在下载";
                 var info = await DownloadSong(this.txtUrl.Text);
                 labState.Text = "正在转码";
-                await ConvertToAmr(this.defaultPath, downloadName, $"{info.Item1}-{info.Item2}.mp3");
+                await ConvertToAmr(this.defaultPath, info.Item3, $"{info.Item1}-{info.Item2}.mp3");
                 labState.Text = "正在移动";
                 await MoveToDisk($"{info.Item1}-{info.Item2}.mp3");
                 MessageBox.Show("下载成功");
@@ -55,10 +51,6 @@ namespace KGDownload
             {
                 labState.Text = "准备就绪";
                 btnDownload.Enabled = true;
-                if (File.Exists(Path.Combine(this.defaultPath, downloadName)))
-                {
-                    File.Delete(Path.Combine(this.defaultPath, downloadName));
-                }
             }
         }
 
@@ -80,10 +72,11 @@ namespace KGDownload
             });
         }
 
-        async private Task<Tuple<string, string>> DownloadSong(string url)
+        async private Task<Tuple<string, string, string>> DownloadSong(string url)
         {
             var artist = string.Empty;
             var title = string.Empty;
+            var downloadName = string.Empty;
             await Task.Run(() =>
             {
                 var needRepeat = false;
@@ -119,13 +112,11 @@ namespace KGDownload
                 }
             });
 
-            return Tuple.Create(artist, title);
+            return Tuple.Create(artist, title, downloadName);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            MessageBox.Show(Environment.ProcessorCount.ToString());
-            //ArtiestPage("https://node.kg.qq.com/personal?uid=619a9d8d232f3f883d");
         }
 
         async private Task MoveToDisk(string fileName)
@@ -159,7 +150,6 @@ namespace KGDownload
                 }
                 if (!copied)
                 {
-                    MessageBox.Show("未找到U盘，请手动复制~");
                     ProcessStartInfo psi = new ProcessStartInfo("E xplorer.exe");
                     psi.Arguments = "/e ," + this.defaultPath + @"\";
                     Process.Start(psi);
