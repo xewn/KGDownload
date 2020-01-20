@@ -23,7 +23,7 @@ namespace KGDownload
         {
             InitializeComponent();
             txtUrl.Text = @"https://kg2.qq.com/node/play?s=UKOgfHUpwb9PeU6T&shareuid=619a9d8d232f3f883d&topsource=a0_pn201001003_z11_u370862839_l1_t1518142422__";
-            txtArtistPage.Text = @"https://node.kg.qq.com/personal?uid=619a9d8d232f3f883d";
+            txtArtistPage.Text = @"http://kg.qq.com/node/personal?uid=619a9c822c2f378b";
             if (!Directory.Exists("songs"))
             {
                 Directory.CreateDirectory("songs");
@@ -107,7 +107,7 @@ namespace KGDownload
                     }
                     catch (Exception e)
                     {
-                        MessageBox.Show(e.Message);
+                        MessageBox.Show(url+e.Message);
                     }
                 }
             });
@@ -150,7 +150,7 @@ namespace KGDownload
                 }
                 if (!copied)
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo("E xplorer.exe");
+                    ProcessStartInfo psi = new ProcessStartInfo("Explorer.exe");
                     psi.Arguments = "/e ," + this.defaultPath + @"\";
                     Process.Start(psi);
                 }
@@ -165,7 +165,21 @@ namespace KGDownload
             {
                 var wc = new WebClient();
                 wc.Encoding = Encoding.UTF8;
-                wc.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36");
+                //wc.Headers.Add(":authority", "node.kg.qq.com");
+                //wc.Headers.Add(":method", "GET");
+                //wc.Headers.Add(":path", "/ cgi / fcgi - bin / kg_ugc_get_homepage ? jsonpCallback = callback_1 & g_tk = 5381 & outCharset = utf - 8 & format = jsonp & type = get_ugc & start = 1 & num = 10 & touin = &share_uid = 619a9c822c2f378b & g_tk_openkey = 5381 & _ = 1519865593089");
+                //wc.Headers.Add(":scheme", "https");
+                //wc.Headers.Add("accept", "text/html,application/xhtml + xml,application/xml; q = 0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+                //wc.Headers.Add("accept-encoding", "gzip, deflate, br");
+                //wc.Headers.Add("accept-language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                wc.Headers.Add("cache-control", "max-age=0");
+                wc.Headers.Add("cookie", "RK=+tTsEw2MNL; ptcz=a614a48f0aa03f6201762989ca244173a50db40ee478010cd1600cbc9f0abdf5; pgv_pvi=1908835328; pgv_pvid=7986820910; pac_uid=0_5ddcc1e5821ed; pgv_info=ssid=s1302126318; qrsig=65613420A856085E919C8E63F9762479; muid=659e988c2428338a3c; openid=oc2eXjlTJkVRWDCmnQIR0iYjHrNI; openkey=JxEAC14lHc4AD0LwAAAAIMUmy2TR1ZS0h1K7mkr8EltgS7yWVf29vbdiBFIwI/9r; opentype=1; uid=735915418; userlevel=2");
+                wc.Headers.Add("sec-fetch-dest", "document");
+                wc.Headers.Add("sec-fetch-mode", "navigate");
+                wc.Headers.Add("sec-fetch-site", "none");
+                wc.Headers.Add("sec-fetch-user", "?1");
+                wc.Headers.Add("upgrade-insecure-requests", "1");
+                wc.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.53 Safari/537.36 Edg/80.0.361.33");
 
                 var artHtml = wc.DownloadString(url);
                 artHtml = artHtml.Substring(artHtml.IndexOf("<span class=\"my_show__name\">")).Replace("<span class=\"my_show__name\">", "");
@@ -204,15 +218,15 @@ namespace KGDownload
 
                         await DownloadSong(mp3Url);
                         Interlocked.Increment(ref doneNum);
-                        labPercent.Text = (doneNum * 100 / allNum) + "%";
+                        //labPercent.Text = (doneNum * 100 / allNum) + "%";
 
                         await ConvertToAmr(this.defaultPath, downloadName, targetName);
                         Interlocked.Increment(ref doneNum);
-                        labPercent.Text = (doneNum * 100 / allNum) + "%";
+                        //labPercent.Text = (doneNum * 100 / allNum) + "%";
 
                         await MoveToDisk(targetName);
                         Interlocked.Increment(ref doneNum);
-                        labPercent.Text = (doneNum * 100 / allNum) + "%";
+                        //labPercent.Text = (doneNum * 100 / allNum) + "%";
                     });
 
                 #endregion Parallel
